@@ -1,7 +1,6 @@
 package utils_test
 
 import (
-	"io"
 	"net"
 	"testing"
 
@@ -9,37 +8,41 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSendMessage(t *testing.T) {
+func TestSendReceive(t *testing.T) {
 	client, server := net.Pipe()
 	defer func() {
+		client.Close()
 		server.Close()
 	}()
 	msg := []byte("Hi there!")
 	go func() {
 		err := utils.SendMessage(client, msg)
 		require.NoError(t, err)
-		client.Close()
-	}()
-
-	received, err := io.ReadAll(server)
-	require.NoError(t, err)
-	require.Equal(t, msg, received)
-}
-
-func TestReceiveMessage(t *testing.T) {
-	client, server := net.Pipe()
-	defer func() {
-		server.Close()
-	}()
-	msg := []byte("Hi there!")
-	go func() {
-		_, err := client.Write(msg)
-		require.NoError(t, err)
-		client.Close()
 	}()
 
 	received, err := utils.ReceiveMessage(server)
 	require.NoError(t, err)
 	require.Equal(t, msg, received)
+}
 
+func TestSendReceiveMoreThanOnce(t *testing.T) {
+	client, server := net.Pipe()
+	defer func() {
+		client.Close()
+		server.Close()
+	}()
+	messages := [][]byte{[]byte("First one"), []byte("Second one")}
+
+	go func() {
+		for _, msg := range messages {
+			err := utils.SendMessage(client, msg)
+			require.NoError(t, err)
+		}
+	}()
+
+	for _, expected := range messages {
+		received, err := utils.ReceiveMessage(server)
+		require.NoError(t, err)
+		require.Equal(t, expected, received)
+	}
 }
