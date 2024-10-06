@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: docker/server.Dockerfile
+    container_name: wow_server
+    environment:
+      - SERVER_ADDR=0.0.0.0:8080
+
+  client:
+    build:
+      context: .
+      dockerfile: docker/client.Dockerfile
+    container_name: wow_client
+    environment:
+      - SERVER_ADDR=server:8080
+    depends_on:
+      - server

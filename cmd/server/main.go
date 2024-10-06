@@ -32,6 +32,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to initialize hashcash pow: %v", err)
 	}
+
 	repo, err := file.NewRepo(repoFile)
 	if err != nil {
 		log.Fatalf("failed to initialize repository: %v", err)
