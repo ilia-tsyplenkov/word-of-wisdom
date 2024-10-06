@@ -2,9 +2,11 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/ilia-tsyplenkov/word-of-wisdom/config"
 	"github.com/ilia-tsyplenkov/word-of-wisdom/internal/pow"
@@ -61,17 +63,27 @@ func (s *internalServer) serve(ctx context.Context) {
 
 	defer s.wg.Wait()
 
+	go func() {
+		<-ctx.Done()
+		s.listener.Close()
+	}()
+
+loop:
 	for {
 		select {
 		case <-ctx.Done():
-			s.listener.Close()
 			return
 		default:
 			conn, err := s.listener.Accept()
-			if err != nil {
+			switch {
+			case errors.Is(err, net.ErrClosed):
+				return
+			case err != nil:
 				log.Errorf("error to accept connection: %v", err)
-				break
+				goto loop
+
 			}
+			conn.SetDeadline(time.Now().Add(3 * time.Second))
 			s.wg.Add(1)
 			// limit number of simultaneously handled connection
 			s.limiter <- struct{}{}
