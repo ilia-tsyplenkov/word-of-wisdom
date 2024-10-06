@@ -3,6 +3,7 @@ module github.com/ilia-tsyplenkov/word-of-wisdom
 go 1.22.3
 
 require (
+	github.com/caarlos0/env/v10 v10.0.0
 	github.com/repbin/repbin v0.0.2
 	github.com/stretchr/testify v1.9.0
 )
