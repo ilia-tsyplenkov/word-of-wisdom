@@ -5,20 +5,22 @@ import (
 )
 
 type POW struct {
-	Complexity uint8 `env:"POW_COMPLEXITY"`
+	Complexity uint8 `env:"POW_COMPLEXITY" envDefault:"10"`
 }
 
 type Common struct {
 	POW
-	LogLevel string `env:"LOG_LEVEL"`
+	LogLevel string `env:"LOG_LEVEL" envDefault:"debug"`
 }
 
 type ServerConfig struct {
+	Addr           string `env:"SERVER_ADDR" envDefault:"127.0.0.1:8080"`
+	RequestLimiter int    `env:"REQUEST_LIMITER" envDefault:"100"`
 	Common
 }
 
 type ClientConfig struct {
-	ServerAddr string `env:"SERVER_ADDR"`
+	ServerAddr string `env:"SERVER_ADDR" envDefault:"127.0.0.1:8080"`
 	Common
 }
 

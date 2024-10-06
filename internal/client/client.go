@@ -1,13 +1,13 @@
 package client
 
 import (
-	"context"
 	"fmt"
 	"net"
 
 	"github.com/ilia-tsyplenkov/word-of-wisdom/config"
 	"github.com/ilia-tsyplenkov/word-of-wisdom/internal/pow"
 	"github.com/ilia-tsyplenkov/word-of-wisdom/internal/utils"
+	log "github.com/sirupsen/logrus"
 )
 
 type client struct {
@@ -22,11 +22,15 @@ func New(cfg *config.ClientConfig, pow pow.POW) *client {
 	}
 }
 
-func (c *client) Start(ctx context.Context, iterations int) error {
+func (c *client) Start(iterations int) {
 	for i := 0; i < iterations; i++ {
-
+		quote, err := c.getQuote()
+		if err != nil {
+			log.Errorf("error to get quote: %v", err)
+		} else {
+			log.Infof("quote: %s", string(quote))
+		}
 	}
-	return nil
 }
 
 func (c *client) getQuote() ([]byte, error) {
