@@ -63,6 +63,9 @@ func (s *internalServer) serve(ctx context.Context) {
 
 	defer s.wg.Wait()
 
+	// we can't do this check
+	// in 'select' statement
+	// because Accept() is a blocking call
 	go func() {
 		<-ctx.Done()
 		s.listener.Close()
