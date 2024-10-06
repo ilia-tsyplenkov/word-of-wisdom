@@ -10,19 +10,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type client struct {
+type internalClient struct {
 	pow    pow.POW
 	config *config.ClientConfig
 }
 
-func New(cfg *config.ClientConfig, pow pow.POW) *client {
-	return &client{
+func New(cfg *config.ClientConfig, pow pow.POW) *internalClient {
+	return &internalClient{
 		pow:    pow,
 		config: cfg,
 	}
 }
 
-func (c *client) Start(iterations int) {
+func (c *internalClient) Run(iterations int) {
 	for i := 0; i < iterations; i++ {
 		quote, err := c.getQuote()
 		if err != nil {
@@ -33,7 +33,7 @@ func (c *client) Start(iterations int) {
 	}
 }
 
-func (c *client) getQuote() ([]byte, error) {
+func (c *internalClient) getQuote() ([]byte, error) {
 	conn, err := net.Dial("tcp", c.config.ServerAddr)
 	if err != nil {
 		return nil, fmt.Errorf("failed connect to the server: %v", err)

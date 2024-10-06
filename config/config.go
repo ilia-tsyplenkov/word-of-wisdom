@@ -20,6 +20,7 @@ type ServerConfig struct {
 }
 
 type ClientConfig struct {
+	Iterations int    `env:"ITERATIONS" envDefault:"10"`
 	ServerAddr string `env:"SERVER_ADDR" envDefault:"127.0.0.1:8080"`
 	Common
 }

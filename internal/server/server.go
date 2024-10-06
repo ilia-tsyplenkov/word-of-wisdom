@@ -13,7 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type server struct {
+type internalServer struct {
 	pow      pow.POW
 	config   *config.ServerConfig
 	listener net.Listener
@@ -24,8 +24,8 @@ type server struct {
 	repo repository.Repository
 }
 
-func New(cfg *config.ServerConfig, pow pow.POW, repo repository.Repository) *server {
-	return &server{
+func New(cfg *config.ServerConfig, pow pow.POW, repo repository.Repository) *internalServer {
+	return &internalServer{
 		pow:     pow,
 		config:  cfg,
 		limiter: make(chan struct{}, cfg.RequestLimiter),
@@ -33,7 +33,7 @@ func New(cfg *config.ServerConfig, pow pow.POW, repo repository.Repository) *ser
 	}
 }
 
-func (s *server) Run() error {
+func (s *internalServer) Run() error {
 	var (
 		err error
 		ctx context.Context
@@ -52,12 +52,12 @@ func (s *server) Run() error {
 	return nil
 }
 
-func (s *server) Stop() {
+func (s *internalServer) Stop() {
 	log.Infof("stopping server")
 	s.cancel()
 }
 
-func (s *server) serve(ctx context.Context) {
+func (s *internalServer) serve(ctx context.Context) {
 
 	defer s.wg.Wait()
 
@@ -89,7 +89,7 @@ func (s *server) serve(ctx context.Context) {
 	}
 }
 
-func (s *server) handle(conn net.Conn) error {
+func (s *internalServer) handle(conn net.Conn) error {
 	defer conn.Close()
 
 	// receive challenge request
